@@ -59,7 +59,6 @@ let catchErrors = (error) => {
 const showMovie = async title => {
   try {
     let response = await fetch (`https://www.omdbapi.com/?apikey=83a076fe&s=${title}&page=${current}`);
-    console.log(current);
     let data = await response.json();
     renderMovies(data.Search);
     
