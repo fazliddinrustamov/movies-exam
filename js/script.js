@@ -9,14 +9,13 @@ let elModalMovie = $(".js-modal-movie");
 
 const elSpinner = document.querySelector(".loading-spinner");
 
+// TOOLS FOR PAGINATION
+
 const btnBox = $(".js-btn-box");  
 const btnNext = $(".next-js-btn");
 const btnBack = $(".back-js-btn");
 
-// TOOLS FOR PAGINATION
-
 let amount = 0;
-let current = 1;
 
 // RENDER MOVIES
 
@@ -41,13 +40,13 @@ let renderMovies = data => {
 
 // ERROR CATCHER
 
-let catchErrors = () => {
+let catchErrors = (error) => {
   movieList.innerHTML = '';
   
   let errorItem = document.createElement("li");
   
   errorItem.innerHTML = `
-  <h5 class="mt-2 h1 link-danger">Not found!</h5>
+  <h5 class="mt-2 h1 link-danger">${error}</h5>
   `;
   
   movieList.appendChild(errorItem);
@@ -56,9 +55,9 @@ let catchErrors = () => {
 
 // FETCH API
 
-const showMovie = async title => {
+const showMovie = async (title, page) => {
   try {
-    let response = await fetch (`http://www.omdbapi.com/?apikey=83a076fe&s=${title}&page=${current}`).finally(addLoader);
+    let response = await fetch (`http://www.omdbapi.com/?apikey=83a076fe&s=${title}&page=${page}`);
     
     let data = await response.json();
     renderMovies(data.Search);
@@ -81,9 +80,13 @@ const showMovie = async title => {
     max = Number(data.totalResults);
     amount = max;
   } catch (err) {
-    catchErrors();
+    catchErrors('Searched movie was not found!');
+  } finally {
+    addLoader();
   }
 }
+
+showMovie('man', 1);
 
 // FORM LISTENER AND PAGINATION
 
@@ -93,7 +96,7 @@ searchForm.addEventListener("submit", (evt) => {
   movieList.innerHTML = '';
   removeLoader();
   
-  let elInputVal = searchPlace.value.trim();
+  elInputVal = searchPlace.value.trim();
   
   showMovie(elInputVal);
   
@@ -101,18 +104,19 @@ searchForm.addEventListener("submit", (evt) => {
   
   btnBox.classList.add('d-block');
   btnBox.classList.remove('d-none');
+  let current = 1;
 
   btnNext.addEventListener('click', () => {
     if (current < Math.ceil(amount/10)) {
       current += 1;
-      showMovie(elInputVal);
+      showMovie(elInputVal, current);
     }
   })
   
   btnBack.addEventListener('click', () => {
     if (current > 1) {
       current -= 1;
-      showMovie(elInputVal);
+      showMovie(elInputVal, current);
     }
   })
 })
