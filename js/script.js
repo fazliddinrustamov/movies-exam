@@ -15,7 +15,8 @@ const btnBox = $(".js-btn-box");
 const btnNext = $(".next-js-btn");
 const btnBack = $(".back-js-btn");
 
-let amount = 0;
+let amount = 0;  
+let current = 1;
 
 // RENDER MOVIES
 
@@ -55,10 +56,10 @@ let catchErrors = (error) => {
 
 // FETCH API
 
-const showMovie = async (title, page) => {
+const showMovie = async title => {
   try {
-    let response = await fetch (`http://www.omdbapi.com/?apikey=83a076fe&s=${title}&page=${page}`);
-    
+    let response = await fetch (`https://www.omdbapi.com/?apikey=83a076fe&s=${title}&page=${current}`);
+    console.log(current);
     let data = await response.json();
     renderMovies(data.Search);
     
@@ -76,8 +77,8 @@ const showMovie = async (title, page) => {
         $('.js-modal-movie-type', elModalMovie).textContent = `Type: ${foundMovies.Type}`;
       }
     })
-    let max = 0;
-    max = Number(data.totalResults);
+
+    max = 0 + Number(data.totalResults);
     amount = max;
   } catch (err) {
     catchErrors('Searched movie was not found!');
@@ -99,26 +100,27 @@ searchForm.addEventListener("submit", (evt) => {
   elInputVal = searchPlace.value.trim();
   
   showMovie(elInputVal);
+
+  current = 1;
   
   searchPlace.value = '';
   
   btnBox.classList.add('d-block');
   btnBox.classList.remove('d-none');
-  let current = 1;
+})
 
-  btnNext.addEventListener('click', () => {
-    if (current < Math.ceil(amount/10)) {
-      current += 1;
-      showMovie(elInputVal, current);
-    }
-  })
-  
-  btnBack.addEventListener('click', () => {
-    if (current > 1) {
-      current -= 1;
-      showMovie(elInputVal, current);
-    }
-  })
+btnNext.addEventListener('click', () => {
+  if (current < Math.ceil(amount/10)) {
+    current += 1;
+    showMovie(elInputVal, current);
+  }
+})
+
+btnBack.addEventListener('click', () => {
+  if (current > 1) {
+    current -= 1;
+    showMovie(elInputVal, current);
+  }
 })
 
 // SPINNER
