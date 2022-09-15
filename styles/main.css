@@ -1,0 +1,21 @@
+.movie-heading {
+  font-size: 54px;
+  color: darkgreen;
+}
+
+.card {
+  border: 7px solid darkgreen;
+  padding: 30px;
+  border-radius: 10px;
+  background-color: lightgoldenrodyellow;
+  transition: 0.3 ease;
+  cursor: pointer;
+  transition: ease 0.3s;
+  width: 400px;
+}
+
+.movie-ytlink-js {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+}
