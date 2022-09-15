@@ -1,3 +1,4 @@
+// CALLING ELEMENTS
 let movieList = $(".movie-list-js");
 let movieRes = $("#template-movies-js").content;
 
@@ -12,9 +13,12 @@ const btnBox = $(".js-btn-box");
 const btnNext = $(".next-js-btn");
 const btnBack = $(".back-js-btn");
 
+// TOOLS FOR PAGINATION
 
 let amount = 0;
 let current = 1;
+
+// RENDER MOVIES
 
 let renderMovies = data => {
   movieList.innerHTML = '';
@@ -35,6 +39,8 @@ let renderMovies = data => {
   movieList.appendChild(movieWrapper);
 }
 
+// ERROR CATCHER
+
 let catchErrors = () => {
   movieList.innerHTML = '';
   
@@ -46,6 +52,40 @@ let catchErrors = () => {
   
   movieList.appendChild(errorItem);
 }
+
+
+// FETCH API
+
+const showMovie = async title => {
+  try {
+    let response = await fetch (`http://www.omdbapi.com/?apikey=83a076fe&s=${title}&page=${current}`).finally(addLoader);
+    
+    let data = await response.json();
+    renderMovies(data.Search);
+    
+    movieList.addEventListener('click', evt => {
+      if (evt.target.matches('.js-movie-info-button')) {
+        let movieId = evt.target.closest(".js-result-item").dataset.movieId;
+        
+        let foundMovies = data.Search.find(movie => {
+          return movie.imdbID === movieId;
+        })
+    
+        $('.js-modal-movie-title', elModalMovie).textContent = foundMovies.Title;
+        $('.js-modal-movie-year', elModalMovie).textContent = `Year: ${foundMovies.Year}`;
+        $('.js-modal-movie-imdbID', elModalMovie).textContent = `Id: ${foundMovies.imdbID}`;
+        $('.js-modal-movie-type', elModalMovie).textContent = `Type: ${foundMovies.Type}`;
+      }
+    })
+    let max = 0;
+    max = Number(data.totalResults);
+    amount = max;
+  } catch (err) {
+    catchErrors();
+  }
+}
+
+// FORM LISTENER AND PAGINATION
 
 searchForm.addEventListener("submit", (evt) => {
   evt.preventDefault()
@@ -77,35 +117,7 @@ searchForm.addEventListener("submit", (evt) => {
   })
 })
 
-
-const showMovie = async title => {
-  try {
-    let response = await fetch (`http://www.omdbapi.com/?apikey=83a076fe&s=${title}&page=${current}`).finally(addLoader);
-    
-    let data = await response.json();
-    renderMovies(data.Search);
-
-    movieList.addEventListener('click', evt => {
-      if (evt.target.matches('.js-movie-info-button')) {
-        let movieId = evt.target.closest(".js-result-item").dataset.movieId;
-    
-        let foundMovies = data.Search.find(movie => {
-          return movie.imdbID === movieId;
-        })
-    
-        $('.js-modal-movie-title', elModalMovie).textContent = foundMovies.Title;
-        $('.js-modal-movie-year', elModalMovie).textContent = `Year: ${foundMovies.Year}`;
-        $('.js-modal-movie-imdbID', elModalMovie).textContent = `Id: ${foundMovies.imdbID}`;
-        $('.js-modal-movie-type', elModalMovie).textContent = `Type: ${foundMovies.Type}`;
-      }
-    })
-    let max = 0;
-    max = Number(data.totalResults);
-    amount = max;
-  } catch (err) {
-    catchErrors();
-  }
-}
+// SPINNER
 
 function removeLoader() {
   elSpinner.classList.remove("d-none");
